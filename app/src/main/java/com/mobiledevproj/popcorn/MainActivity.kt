@@ -46,12 +46,22 @@ import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import okhttp3.OkHttpClient
+import okhttp3.Request
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,16 +109,47 @@ fun Greeting(name: String, modifier: Modifier = Modifier){
     }
 }
 
-// SearchBar
+fun fetchUpcomingMovies(query: String): List<Movie> {
+    val client = OkHttpClient()
 
+    val request = Request.Builder()
+        .url("https://moviesdatabase.p.rapidapi.com/titles/x/upcoming?titleType=$query")
+        .get()
+        .addHeader("X-RapidAPI-Key", "980648891cmsh4d49ee8f2888ad9p1dc229jsn2b550bba1d65")
+        .addHeader("X-RapidAPI-Host", "moviesdatabase.p.rapidapi.com")
+        .build()
+
+    val response = client.newCall(request).execute()
+
+    if (response.isSuccessful) {
+        val responseBody = response.body?.string()
+        // Parse the response and return a list of Movie objects
+        // Example:
+        // val movies = parseMovies(responseBody)
+        // return movies
+    } else {
+        // Handle the error case if the request is not successful
+        // For example, you can log an error message or throw an exception
+    }
+
+    return emptyList()
+}
+
+
+
+
+// SearchBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier
 ) {
+    var query by remember { mutableStateOf("") }
+    val focusRequester = FocusRequester()
+
     TextField(
-        value = "",
-        onValueChange = {},
+        value = query,
+        onValueChange = { query = it },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -125,6 +166,17 @@ fun SearchBar(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
+            .focusRequester(focusRequester),  // Assign the focusRequester
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                val movies = fetchUpcomingMovies(query)
+                // Do something with the list of movies
+                movies.toString()
+
+                // Request focus on another element to dismiss the keyboard
+                focusRequester.requestFocus()
+            }
+        )
     )
 }
 

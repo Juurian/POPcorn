@@ -88,6 +88,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.LaunchedEffect
 import org.json.JSONArray
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -104,6 +105,7 @@ The entry point for the POPcorn application.
 It initializes the UI and handles navigation using Jetpack Compose.
  */
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
